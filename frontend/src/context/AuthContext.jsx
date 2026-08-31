@@ -8,10 +8,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await getCurrentUser();
       setUser(res.data.data);
     } catch {
+      localStorage.removeItem("accessToken");
       setUser(null);
     } finally {
       setLoading(false);
@@ -24,6 +30,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     const res = await loginUser(credentials);
+    localStorage.setItem("accessToken", res.data.data.accessToken);
     setUser(res.data.data.user);
     return res.data.data.user;
   };
@@ -35,6 +42,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await logoutUser();
+    localStorage.removeItem("accessToken");
     setUser(null);
   };
 
