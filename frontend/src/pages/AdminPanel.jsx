@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getAdminStats } from "../api/endpoints.js";
+import { SkeletonStat } from "../components/Skeleton.jsx";
 
 const StatCard = ({ label, value, color }) => (
   <motion.div
@@ -30,7 +31,11 @@ const AdminPanel = () => {
       <h1 className="font-display text-3xl font-medium mb-8">Platform Overview</h1>
 
       {!stats ? (
-        <p className="text-black/50">Loading stats...</p>
+        <div className="grid md:grid-cols-3 gap-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonStat key={i} />
+          ))}
+        </div>
       ) : (
         <div className="grid md:grid-cols-3 gap-5">
           <StatCard label="Meals Saved" value={stats.totalMealsSaved} color="var(--color-primary)" />

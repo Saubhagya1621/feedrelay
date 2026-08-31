@@ -12,8 +12,25 @@ import AdminPanel from "./pages/AdminPanel.jsx";
 
 function App() {
   return (
-    <div className="min-h-screen bg-[var(--color-base-light)]">
-      <Toaster position="top-center" />
+    <div className="min-h-screen">
+      <div className="food-bg">
+        <div className="food-bg-pattern" />
+      </div>
+
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: "#1A1A1F",
+            color: "#FAF8F3",
+            borderRadius: "12px",
+            fontSize: "14px",
+            fontFamily: "var(--font-body)",
+          },
+          success: { iconTheme: { primary: "#4CAE6D", secondary: "#FAF8F3" } },
+          error: { iconTheme: { primary: "#E85A4F", secondary: "#FAF8F3" } },
+        }}
+      />
       <Navbar />
       <Routes>
         <Route path="/" element={<LandingPage />} />

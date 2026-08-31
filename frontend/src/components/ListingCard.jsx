@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import UrgencyBadge from "./UrgencyBadge.jsx";
+import Avatar from "./Avatar.jsx";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -15,7 +16,7 @@ const cardVariants = {
   },
 };
 
-const ListingCard = ({ listing, index, onClaim, claiming, showClaimButton = true }) => {
+const ListingCard = ({ listing, index, onClaim, onView, claiming, showClaimButton = true }) => {
   return (
     <motion.div
       layout
@@ -24,17 +25,21 @@ const ListingCard = ({ listing, index, onClaim, claiming, showClaimButton = true
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
+      onClick={() => onView?.(listing)}
+      className={`rounded-2xl border border-black/5 bg-white p-5 shadow-sm hover:shadow-md transition-shadow ${onView ? "cursor-pointer" : ""}`}
     >
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="font-display text-lg font-medium text-[var(--color-base-dark)]">
-            {listing.foodType}
-          </h3>
-          <p className="text-sm text-black/60 mt-0.5">
-            {listing.quantity?.value} {listing.quantity?.unit} ·{" "}
-            {listing.restaurant?.name}
-          </p>
+        <div className="flex items-center gap-3">
+          <Avatar name={listing.restaurant?.name} role="restaurant" size={38} />
+          <div>
+            <h3 className="font-display text-lg font-medium text-[var(--color-base-dark)]">
+              {listing.foodType}
+            </h3>
+            <p className="text-sm text-black/60 mt-0.5">
+              {listing.quantity?.value} {listing.quantity?.unit} ·{" "}
+              {listing.restaurant?.name}
+            </p>
+          </div>
         </div>
         <UrgencyBadge expiresAt={listing.expiresAt} urgency={listing.urgency} />
       </div>
@@ -45,7 +50,10 @@ const ListingCard = ({ listing, index, onClaim, claiming, showClaimButton = true
 
       {showClaimButton && (
         <motion.button
-          onClick={() => onClaim(listing._id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClaim(listing._id);
+          }}
           disabled={claiming}
           whileTap={{ scale: 0.96 }}
           whileHover={{ scale: 1.02 }}

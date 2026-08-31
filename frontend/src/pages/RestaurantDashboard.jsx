@@ -2,6 +2,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import ListingCard from "../components/ListingCard.jsx";
+import EmptyState from "../components/EmptyState.jsx";
+import { SkeletonGrid } from "../components/Skeleton.jsx";
+import StatStrip from "../components/StatStrip.jsx";
 import { createListing, getMyListings, cancelListing } from "../api/endpoints.js";
 
 const emptyForm = {
@@ -65,9 +68,15 @@ const RestaurantDashboard = () => {
     }
   };
 
+  const activeCount = listings.filter((l) => l.status === "available").length;
+  const completedCount = listings.filter((l) => l.status === "picked_up").length;
+  const totalServings = listings
+    .filter((l) => l.status === "picked_up")
+    .reduce((sum, l) => sum + (l.quantity?.value || 0), 0);
+
   return (
     <div className="px-6 py-10 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-3xl font-medium">Your Listings</h1>
         <motion.button
           whileTap={{ scale: 0.96 }}
@@ -78,6 +87,16 @@ const RestaurantDashboard = () => {
           {showForm ? "Cancel" : "+ New Listing"}
         </motion.button>
       </div>
+
+      {!loading && listings.length > 0 && (
+        <StatStrip
+          stats={[
+            { label: "Active listings", value: activeCount, color: "var(--color-urgency-medium)" },
+            { label: "Completed pickups", value: completedCount, color: "var(--color-ngo)" },
+            { label: "Servings donated", value: totalServings, color: "var(--color-primary)" },
+          ]}
+        />
+      )}
 
       <AnimatePresence>
         {showForm && (
@@ -131,9 +150,13 @@ const RestaurantDashboard = () => {
       </AnimatePresence>
 
       {loading ? (
-        <p className="text-black/50">Loading...</p>
+        <SkeletonGrid count={2} />
       ) : listings.length === 0 ? (
-        <p className="text-black/50">No listings yet. Post your first one above.</p>
+        <EmptyState
+          icon="🍛"
+          title="No listings yet"
+          subtitle="Post your first surplus food listing above and NGOs nearby will see it instantly."
+        />
       ) : (
         <div className="grid md:grid-cols-2 gap-5">
           <AnimatePresence>
